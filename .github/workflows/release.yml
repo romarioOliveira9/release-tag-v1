@@ -1,10 +1,18 @@
-name: Release & Publish to NPM
-on: workflow_dispatch
+name: Bump version
+on:
+  push:
+    branches:
+      - master
 jobs:
-  release:
-    runs-on: ubuntu-20.04
+  build:
+    runs-on: ubuntu-22.04
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v2
-      - name: End message
-        run: echo 'All done!'
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: '0'
+
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@1.55.0 # Don't use @master unless you're happy to test the latest version
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: true
