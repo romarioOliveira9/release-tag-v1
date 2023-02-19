@@ -1,53 +1,21 @@
-name: release
+name: Bump version
 on:
   push:
     branches:
-      - main
-    tags:
-      - "v*.*.*"
-  pull_request:
-    types:
-      - labeled
+      - master
 jobs:
-  release:
-    if: github.event.action != 'labeled'
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      # Bump version on merging Pull Requests with specific labels.
-      # (bump:major,bump:minor,bump:patch)
-      - id: bumpr
-        if: "!startsWith(github.ref, 'refs/tags/')"
-        uses: haya14busa/action-bumpr@v1
-      # Update corresponding major and minor tag.
-      # e.g. Update v1 and v1.2 when releasing v1.2.3
-      - uses: haya14busa/action-update-semver@v1
-        if: "!steps.bumpr.outputs.skip"
+      - uses: actions/checkout@v2
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.1
         with:
-          tag: ${{ steps.bumpr.outputs.next_version }}
-      # Get tag name.
-      - id: tag
-        uses: haya14busa/action-cond@v1
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
         with:
-          cond: "${{ startsWith(github.ref, 'refs/tags/') }}"
-          if_true: ${{ github.ref }}
-          if_false: ${{ steps.bumpr.outputs.next_version }}
-      # Create release.
-      - uses: actions/create-release@v1
-        if: "steps.tag.outputs.value != ''"
-        env:
-          # This token is provided by Actions, you do not need to create your own token
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.tag.outputs.value }}
-          release_name: Release ${{ steps.tag.outputs.value }}
-          body: ${{ steps.bumpr.outputs.message }}
-          draft: false
-          prerelease: false
-  release-check:
-    if: github.event.action == 'labeled'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Post bumpr status comment
-        uses: haya14busa/action-bumpr@v1
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
