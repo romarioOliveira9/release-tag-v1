@@ -1,20 +1,12 @@
-on: 
-  push:
-    branches:
-      - main
-
+name: Release & Publish to NPM
+on: workflow_dispatch
 jobs:
-  release-on-push:
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  release:
+    runs-on: ubuntu-20.04
     steps:
-      - id: release
-        with:
-          bump_version_scheme: minor
-          tag_prefix: v
-          
-      - name: Check Output Parameters
-        run: |
-          echo "Got tag name ${{ steps.release.outputs.tag_name }}"
-          echo "Got release version ${{ steps.release.outputs.version }}"
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Install the dependancies
+        run: npm ci
+      - name: End message
+        run: echo 'All done!'
