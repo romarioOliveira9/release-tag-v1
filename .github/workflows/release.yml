@@ -6,7 +6,5 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
-      - name: Install the dependancies
-        run: npm ci
       - name: End message
         run: echo 'All done!'
