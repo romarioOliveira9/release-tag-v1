@@ -1,13 +1,11 @@
+name: Release & Publish to NPM
 on: 
   push:
     branches:
       - main
-
 jobs:
-  release-on-push:
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  release:
+    runs-on: ubuntu-20.04
     steps:
       - id: release
         with:
