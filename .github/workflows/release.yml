@@ -1,22 +1,15 @@
-name: Release & Publish to NPM
+name: Release
 on: 
   push:
-    branches:
-      - master
+    tags:
+      - "v*"
 
 jobs:
-  release-on-push:
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  release:
+    name: "Release"
+    runs-on: "ubuntu-latest"
     steps:
-      - id: release
-        uses: rymndhng/release-on-push-action@master
+      - uses: "romarioOliveira9/release-tag-v1@main"
         with:
-          bump_version_scheme: minor
-          tag_prefix: v
-          
-      - name: Check Output Parameters
-        run: |
-          echo "Got tag name ${{ steps.release.outputs.tag_name }}"
-          echo "Got release version ${{ steps.release.outputs.version }}"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
